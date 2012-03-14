@@ -3,8 +3,11 @@ package Log::UDP::Daemon;
 use Modern::Perl;
 use AnyEvent;
 use AnyEvent::Handle::UDP;
+use YAML qw'LoadFile';
+use Daemon::Generic;
 use Data::Dumper;
 use Moose;
+use base 'Daemon::Generic';
 
 has 'conf', is => 'rw', isa => 'HashRef[Any]';
 has 'server', is => 'rw', isa => 'AnyEvent::Handle::UDP';
@@ -40,21 +43,33 @@ A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
-
-=head2 start
-	
 =cut
 
-sub start {
+sub startServer {
 	my $self = shift;
 	
 	my $cv = AnyEvent->condvar;
 	my $server = AnyEvent::Handle::UDP->new(
 				bind => ['127.0.0.1',$self->conf->{server}{port}],
-				on_recv => sub { $self->handler($_[0]) }
+				on_recv => sub { $self->handler($_[0]); }
 			);
 	
 	$self->server($server);
+	
+	$self->loadStorage();
+	
+	$cv->recv();
+}
+
+sub loadConfig {
+	my $self = shift;
+	my $yaml_configfile = shift;
+	my $conf = LoadFile($yaml_configfile);
+	$self->conf($conf);
+}
+
+sub loadStorage {
+	my $self = shift;
 	
 	my $driver = $self->conf->{logging}{driver};
 	my $driver_package = 'Log::UDP::Daemon::'.$driver;
@@ -68,12 +83,49 @@ sub start {
 	
 	$self->storage( $driver_package->new(conf=>$driver_conf) );
 	
-	$cv->recv();
+	$self->storage->open();
 }
 
 sub handler {
 	my $self = shift;
 	say Dumper(@_);
+}
+
+=head2 Daemon methods
+
+=head3 start
+	
+=cut
+
+sub start {
+	my $yaml_configfile = $_[1];
+	my $conf = LoadFile($yaml_configfile);
+	
+	newdaemon(
+		foreground => 1,
+		progname => $conf->{daemon}{name},
+		pidfile => $conf->{daemon}{pid},
+		debug => 0,
+		conf => $conf
+	);
+}
+
+=head3 gd_preconfig
+	
+=cut
+sub gd_preconfig{
+	my $self = shift;
+	$self->{gd_pidfile} = $self->{gd_args}{conf}{daemon}{pid};
+	return ();
+}
+
+=head3 gd_run
+	
+=cut
+sub gd_run {
+	my $self = shift;
+	$self->conf($self->{gd_args}{conf});
+	$self->startServer();
 }
 
 =head1 AUTHOR
@@ -127,8 +179,7 @@ L<http://search.cpan.org/dist/Log-UDP-Daemon/>
 Copyright 2012 Daniel Lopes.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+under the terms of the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
