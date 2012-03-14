@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use lib './lib';
+use Modern::Perl;
+use YAML qw'LoadFile';
+use Cwd qw'cwd abs_path';
+use File::Basename;
+use File::Spec;
+use Daemon::Generic;
+use Data::Dumper;
+
+use Log::UDP::Daemon;
+
+# default config
+my $yaml_configfile = abs_path(dirname(__FILE__)).'/conf/default.yaml';
+
+my $conf = LoadFile($yaml_configfile);
+
+sub gd_preconfig{}
+
+sub gd_run {
+	my $server = Log::UDP::Daemon->new(conf => $conf);
+	
+	$server->start();
+}
+
+newdaemon(
+	foreground => 1,
+	progname => $conf->{daemon}{name},
+	pidfile => $conf->{daemon}{pid}
+);

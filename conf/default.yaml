@@ -1,0 +1,11 @@
+---
+daemon:
+  name: log_udp_daemon
+  pid: /tmp/log_udp_daemon.pid
+server:
+  port: 9011
+logging:
+  driver: MongoDB
+MongoDB:
+  host: localhost
+  port: 9002
