@@ -72,7 +72,12 @@ sub startServer {
 sub loadConfig {
 	my $self = shift;
 	my $yaml_configfile = shift;
-	my $conf = LoadFile($yaml_configfile);
+	my $conf;
+	eval{
+		$conf = LoadFile($yaml_configfile);
+	};
+	die($@) if($@);
+	
 	$self->conf($conf);
 }
 
@@ -117,13 +122,11 @@ sub validMsg {
 	
 	return 0 if(ref $msg ne 'HASH');
 	
-	return 0 if(not exists($msg->{timestamp}));
+	my $man = $self->conf->{logging}->{mandatory_fields};
 	
-	return 0 if(not exists($msg->{hostname}));
-	
-	return 0 if(not exists($msg->{class}));
-	
-	return 0 if(not exists($msg->{method}));
+	for my $field (@$man) {
+		return 0 if(not exists($msg->{$field}));
+	}
 	
 	return 1;
 }

@@ -6,6 +6,11 @@ server:
   port: 9011
 logging:
   driver: MongoDB
+  mandatory_fields:
+    - class
+    - method
+    - hostname
+    - timestamp
 MongoDB:
   host: localhost
   port: 9002
