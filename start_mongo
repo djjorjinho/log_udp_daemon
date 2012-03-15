@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+$MONGODB/mongod --config="./db/mongodb.conf" --fork

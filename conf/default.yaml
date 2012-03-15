@@ -9,3 +9,4 @@ logging:
 MongoDB:
   host: localhost
   port: 9002
+  db: log_daemon
