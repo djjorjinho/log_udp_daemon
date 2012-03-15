@@ -10,6 +10,8 @@ use Data::Dumper;
 use Log::UDP::Daemon;
 
 # default config
-my $yaml_configfile = abs_path(dirname(__FILE__)).'/conf/default.yaml';
+my $yaml_configfile = $ARGV[1]
+						|| $ENV{LOG_UDP_DAEMON_CONF}
+						|| abs_path(dirname(__FILE__)).'/conf/default.yaml';
 
 Log::UDP::Daemon->start($yaml_configfile);

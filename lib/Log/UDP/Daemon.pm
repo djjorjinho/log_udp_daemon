@@ -7,11 +7,15 @@ use YAML qw'LoadFile';
 use Daemon::Generic;
 use Data::Dumper;
 use Moose;
+use JSON::XS;
+use integer;
+
 use base 'Daemon::Generic';
 
 has 'conf', is => 'rw', isa => 'HashRef[Any]';
 has 'server', is => 'rw', isa => 'AnyEvent::Handle::UDP';
-has 'storage', is => 'rw', isa => 'Any';
+has 'storage', is => 'rw', does=>'Log::UDP::Daemon::StorableRole';
+has 'json', is=>'rw', isa => 'JSON::XS';
 
 =head1 NAME
 
@@ -43,6 +47,9 @@ A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
+
+=head2 startServer
+	Creates the UDP communication loop.
 =cut
 
 sub startServer {
@@ -51,12 +58,13 @@ sub startServer {
 	my $cv = AnyEvent->condvar;
 	my $server = AnyEvent::Handle::UDP->new(
 				bind => ['127.0.0.1',$self->conf->{server}{port}],
-				on_recv => sub { $self->handler($_[0]); }
+				on_recv => sub { $self->handler(@_); }
 			);
 	
 	$self->server($server);
 	
 	$self->loadStorage();
+	$self->loadJson();
 	
 	$cv->recv();
 }
@@ -68,6 +76,15 @@ sub loadConfig {
 	$self->conf($conf);
 }
 
+sub loadJson {
+	my $self = shift;
+	$self->json(JSON::XS->new);
+}
+
+=head2 loadStorage
+	Takes the driver class from the configuration
+	and creates a new driver instance.
+=cut
 sub loadStorage {
 	my $self = shift;
 	
@@ -88,7 +105,27 @@ sub loadStorage {
 
 sub handler {
 	my $self = shift;
-	say Dumper(@_);
+	my ($dtg,$h,$addr) = @_;
+	my $msg = $self->json->decode($dtg);
+	
+	$self->storage->append($msg) if($self->validMsg($msg));
+}
+
+sub validMsg {
+	my $self = shift;
+	my $msg = shift;
+	
+	return 0 if(ref $msg ne 'HASH');
+	
+	return 0 if(not exists($msg->{timestamp}));
+	
+	return 0 if(not exists($msg->{hostname}));
+	
+	return 0 if(not exists($msg->{class}));
+	
+	return 0 if(not exists($msg->{method}));
+	
+	return 1;
 }
 
 =head2 Daemon methods

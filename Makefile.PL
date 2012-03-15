@@ -20,7 +20,8 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'Exception::Class::TryCatch' => 0,
 		'Daemon::Generic' => 0,
-		'Moose' => 0
+		'Moose' => 0,
+		'JSON::XS' => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Log-UDP-Daemon-*' },
