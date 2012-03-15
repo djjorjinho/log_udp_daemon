@@ -23,6 +23,7 @@ requires:
   Exception::Class::TryCatch: 0
   File::Basename: 0
   File::Spec: 0
+  JSON::XS: 0
   Moose: 0
   Test::More: 0
   YAML: 0
