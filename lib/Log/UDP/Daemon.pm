@@ -58,7 +58,15 @@ sub startServer {
 	my $cv = AnyEvent->condvar;
 	my $server = AnyEvent::Handle::UDP->new(
 				bind => ['127.0.0.1',$self->conf->{server}{port}],
-				on_recv => sub { $self->handler(@_); }
+				on_recv => sub {
+					eval{
+						$self->handler(@_);
+					};
+					if($@){
+						print STDERR $@;
+					}
+					return "\cD";
+				}
 			);
 	
 	$self->server($server);
@@ -111,6 +119,7 @@ sub loadStorage {
 sub handler {
 	my $self = shift;
 	my ($dtg,$h,$addr) = @_;
+
 	my $msg = $self->json->decode($dtg);
 	
 	$self->storage->append($msg) if($self->validMsg($msg));
