@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new Log::UDP::Daemon!",
+   "abstract" : "UDP logging daemon with a storage adaptor for MongoDB, File, etc.",
    "author" : [
       "Daniel Lopes <dl.lopes@gmail.com>"
    ],
@@ -45,5 +45,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "version" : "0.05"
 }

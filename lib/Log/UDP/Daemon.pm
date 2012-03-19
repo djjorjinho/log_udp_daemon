@@ -19,32 +19,30 @@ has 'json', is=>'rw', isa => 'JSON::XS';
 
 =head1 NAME
 
-Log::UDP::Daemon - The great new Log::UDP::Daemon!
-
-=head1 VERSION
-
-Version 0.01
+Log::UDP::Daemon - UDP logging daemon with a storage adaptor for MongoDB, File, etc.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+Start the daemon by using the log_udp_daemon script:
 
-Perhaps a little code snippet.
+	log_udp_daemon start [optional_config_file_path]
 
-    use Log::UDP::Daemon;
+Use the 'stop' command to shutdown the daemon.
 
-    my $foo = Log::UDP::Daemon->new();
-    ...
+The configuration is a YAML file that holds information like the pid file,
+the udp port and the storage driver to save the log messages.
+Each driver has it's own configuration so take a look at the default.yaml file.
 
-=head1 EXPORT
+Messages must be sent in JSON format.
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+You can test by issuing a netcat to your daemon's host/port:
+
+	echo "{'hello':'world'}" | nc -w1 -u 127.0.0.1 9011
 
 =head1 SUBROUTINES/METHODS
 
@@ -77,6 +75,9 @@ sub startServer {
 	$cv->recv();
 }
 
+=head2 loadConfig
+	Loads the configuration file.
+=cut
 sub loadConfig {
 	my $self = shift;
 	my $yaml_configfile = shift;
@@ -89,6 +90,9 @@ sub loadConfig {
 	$self->conf($conf);
 }
 
+=head2 loadJson
+	Creates an instance of the JSON::XS decoder.
+=cut
 sub loadJson {
 	my $self = shift;
 	$self->json(JSON::XS->new);
@@ -116,34 +120,23 @@ sub loadStorage {
 	$self->storage->open();
 }
 
+=head2 handler
+	The method that processes what happens to the received message.
+	Sends the message to the storage driver to be verified and saved.
+=cut
 sub handler {
 	my $self = shift;
 	my ($dtg,$h,$addr) = @_;
 
 	my $msg = $self->json->decode($dtg);
 	
-	$self->storage->append($msg) if($self->validMsg($msg));
-}
-
-sub validMsg {
-	my $self = shift;
-	my $msg = shift;
-	
-	return 0 if(ref $msg ne 'HASH');
-	
-	my $man = $self->conf->{logging}->{mandatory_fields};
-	
-	for my $field (@$man) {
-		return 0 if(not exists($msg->{$field}));
-	}
-	
-	return 1;
+	$self->storage->append($msg);
 }
 
 =head2 Daemon methods
 
 =head3 start
-	
+	Starts the daemon and the udp server.
 =cut
 
 sub start {
@@ -183,12 +176,7 @@ Daniel Lopes, C<< <dl.lopes at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-log-udp-daemon at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-UDP-Daemon>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests in the GitHub page.
 
 =head1 SUPPORT
 
@@ -196,32 +184,8 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Log::UDP::Daemon
 
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-UDP-Daemon>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Log-UDP-Daemon>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Log-UDP-Daemon>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Log-UDP-Daemon/>
-
-=back
-
-
 =head1 ACKNOWLEDGEMENTS
-
+	Thank you Modern Perl book...
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -231,7 +195,6 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

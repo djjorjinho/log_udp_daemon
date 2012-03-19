@@ -5,13 +5,24 @@ daemon:
 server:
   port: 9011
 logging:
-  driver: MongoDB
-  mandatory_fields:
-    - class
-    - method
-    - hostname
-    - timestamp
+  driver: LogFile
 MongoDB:
   host: localhost
   port: 9002
   db: log_daemon
+  fields:
+    - class
+    - method
+    - hostname
+    - timestamp
+LogFile:
+  prefix: udplog_
+  ext: log
+  path: /tmp
+  fields:
+    - timestamp
+    - hostname
+    - class
+    - method
+    - level
+    - data

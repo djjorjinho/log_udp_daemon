@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new Log::UDP::Daemon!'
+abstract: 'UDP logging daemon with a storage adaptor for MongoDB, File, etc.'
 author:
   - 'Daniel Lopes <dl.lopes@gmail.com>'
 build_requires:
@@ -27,4 +27,4 @@ requires:
   Moose: 0
   Test::More: 0
   YAML: 0
-version: 0.01
+version: 0.05
