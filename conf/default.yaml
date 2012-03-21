@@ -6,7 +6,7 @@ daemon:
 server:
   port: 9011
 logging:
-  driver: MongoDB
+  driver: LogFile
 MongoDB:
   host: localhost
   port: 9002
