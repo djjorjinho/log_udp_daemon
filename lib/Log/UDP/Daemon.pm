@@ -109,6 +109,7 @@ sub loadStorage {
 	my $driver_package = 'Log::UDP::Daemon::'.$driver;
 	my $driver_conf = $self->conf->{$driver};
 	eval "use $driver_package;";
+	die $@ if($@);
 	
 	my $driver_new;
 	eval { $driver_new = $driver_package->can('new') };
