@@ -2,7 +2,7 @@
 daemon:
   name: log_udp_daemon
   pid: /tmp/log_udp_daemon.pid
-  foreground: 0
+  foreground: 1
 server:
   port: 9011
 logging:

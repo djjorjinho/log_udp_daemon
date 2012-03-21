@@ -8,9 +8,9 @@ WriteMakefile(
     AUTHOR              => q{Daniel Lopes <dl.lopes@gmail.com>},
     VERSION_FROM        => 'lib/Log/UDP/Daemon.pm',
     ABSTRACT_FROM       => 'lib/Log/UDP/Daemon.pm',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    CONFIGURE_REQUIRES => {
+    	"ExtUtils::MakeMaker" => "6.30"
+    },
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
