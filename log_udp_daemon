@@ -1,11 +1,12 @@
 #!/usr/bin/env perl
 
-use lib './lib';
 use Modern::Perl;
 use Cwd qw'cwd abs_path';
 use File::Basename;
 use File::Spec;
 use Data::Dumper;
+
+use lib join('/', File::Spec->splitdir(abs_path(dirname(__FILE__))), 'lib');
 
 use Log::UDP::Daemon;
 
