@@ -23,7 +23,8 @@ WriteMakefile(
 		'Moose' => 0,
 		'JSON::XS' => 0,
 		'Modern::Perl' => 0,
-		'DBD::mysql' => 0
+		'DBD::mysql' => 0,
+		'DateTime' => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Log-UDP-Daemon-*' },
