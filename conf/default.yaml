@@ -2,10 +2,11 @@
 daemon:
   name: log_udp_daemon
   pid: /tmp/log_udp_daemon.pid
+  foreground: 0
 server:
   port: 9011
 logging:
-  driver: LogFile
+  driver: MongoDB
 MongoDB:
   host: localhost
   port: 9002
@@ -26,3 +27,16 @@ LogFile:
     - method
     - level
     - data
+MySQL:
+  host: localhost
+  port: 3306
+  db: test
+  user: root
+  pass: xpto
+  fields:
+    - timestamp
+    - hostname
+    - class
+    - method
+  optional:
+    - user_id

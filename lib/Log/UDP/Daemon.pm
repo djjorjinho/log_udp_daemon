@@ -144,7 +144,7 @@ sub start {
 	my $conf = LoadFile($yaml_configfile);
 	
 	newdaemon(
-		foreground => 0,
+		foreground => $conf->{daemon}{foreground}||0,
 		progname => $conf->{daemon}{name},
 		pidfile => $conf->{daemon}{pid},
 		debug => 0,
