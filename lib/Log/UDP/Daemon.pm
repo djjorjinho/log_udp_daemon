@@ -55,7 +55,7 @@ sub startServer {
 	
 	my $cv = AnyEvent->condvar;
 	my $server = AnyEvent::Handle::UDP->new(
-				bind => ['127.0.0.1',$self->conf->{server}{port}],
+				bind => ['0.0.0.0',$self->conf->{server}{port}],
 				on_recv => sub {
 					eval{
 						$self->handler(@_);

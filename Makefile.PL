@@ -1,7 +1,9 @@
 use 5.006;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+#use ExtUtils::MakeMaker;
+use inc::Module::Install;
+use Module::Install::AutoInstall;
 
 WriteMakefile(
     NAME                => 'Log::UDP::Daemon',
@@ -29,3 +31,4 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Log-UDP-Daemon-*' },
 );
+auto_install();

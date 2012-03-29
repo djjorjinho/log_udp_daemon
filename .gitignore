@@ -13,3 +13,6 @@ Log-UDP-Daemon-*
 *.pid
 db/mongodb
 mongod.lock
+META.yml
+inc/
+MYMETA.yml
